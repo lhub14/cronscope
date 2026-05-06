@@ -34,6 +34,11 @@ def _validate_single_value(value: str, min_val: int, max_val: int, field_name: s
 
 
 def _validate_field(token: str, min_val: int, max_val: int, field_name: str) -> Optional[str]:
+    """Validate a single cron field token against the given constraints.
+
+    Supports wildcards (*), step syntax (*/n, value/n, range/n),
+    ranges (a-b), comma-separated lists, and plain integer values.
+    """
     if token == "*":
         return None
 
@@ -91,7 +96,7 @@ def validate(expression: str) -> ValidationResult:
     if len(fields) != 5:
         return ValidationResult(
             valid=False,
-            error=f"Expected 5 fields, got {len(fields)}: '{expression}'",
+            error=f"Expected 5 fields, got {len(fields)}",
         )
 
     for token, (min_val, max_val, field_name) in zip(fields, FIELD_CONSTRAINTS):
