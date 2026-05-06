@@ -86,3 +86,17 @@ def test_default_start_uses_now(monkeypatch):
     # (patching datetime fully is complex; we test the param default path)
     results = next_occurrences("0 9 * * *", start=fixed_now, count=1)
     assert isinstance(results, list)
+
+
+@pytest.mark.parametrize("expression", [
+    "60 * * * *",   # minute out of range
+    "* 25 * * *",   # hour out of range
+    "* * 32 * *",   # day out of range
+    "* * * 13 *",   # month out of range
+    "* * * * 7",    # weekday out of range (0-6)
+    "not_a_cron",   # completely invalid
+])
+def test_invalid_cron_expression_raises(expression):
+    """Invalid cron expressions should raise a ValueError."""
+    with pytest.raises(ValueError):
+        next_occurrences(expression, start=FIXED_START, count=1)
