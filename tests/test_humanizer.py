@@ -65,3 +65,34 @@ def test_every_minute_specific_hour():
     result = humanize(expr)
     assert "every minute" in result
     assert "6" in result
+
+
+@pytest.mark.parametrize(
+    ("expression", "expected_parts"),
+    [
+        (
+            "1-5/2 * * * *",
+            ["every 2 minutes", "between minute 1 and minute 5"],
+        ),
+        (
+            "0 1-5/2 * * *",
+            ["every 2 hours", "between hour 1 and hour 5"],
+        ),
+        (
+            "0 0 1-5/2 * *",
+            ["every 2 days", "between day 1 and day 5"],
+        ),
+        (
+            "0 0 * 1-5/2 *",
+            ["every 2 months", "between January and May"],
+        ),
+        (
+            "0 0 * * 1-5/2",
+            ["every 2 days", "between Monday and Friday"],
+        ),
+    ],
+)
+def test_range_step_fields_include_range_bounds(expression, expected_parts):
+    result = humanize(parse(expression))
+    for expected in expected_parts:
+        assert expected in result
